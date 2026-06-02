@@ -130,38 +130,38 @@ body::before {
 .summary-lbl { font-size: 10px; color: var(--maple-light); letter-spacing: 0.05em; text-transform: uppercase; }
 
 /* ── PIN SCREEN ── */
-#screen-pin .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 0; }
+#screen-pin .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 16px; gap: 0; overflow: hidden; }
 .pin-avatar {
-  width: 70px; height: 70px; border-radius: 50%;
+  width: 54px; height: 54px; border-radius: 50%;
   background: linear-gradient(135deg, var(--maple-dark), var(--maple));
   display: flex; align-items: center; justify-content: center;
   font-family: 'Playfair Display', serif;
-  font-size: 28px; font-weight: 700; color: var(--cream);
-  margin-bottom: 12px;
+  font-size: 20px; font-weight: 700; color: var(--cream);
+  margin-bottom: 6px; flex-shrink: 0;
 }
-.pin-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--cream); margin-bottom: 4px; }
-.pin-instruction { font-size: 13px; color: var(--maple-light); margin-bottom: 28px; text-align: center; line-height: 1.5; }
-.pin-dots { display: flex; gap: 14px; margin-bottom: 32px; }
+.pin-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--cream); margin-bottom: 2px; }
+.pin-instruction { font-size: 12px; color: var(--maple-light); margin-bottom: 14px; text-align: center; line-height: 1.4; }
+.pin-dots { display: flex; gap: 12px; margin-bottom: 14px; }
 .pin-dot {
-  width: 14px; height: 14px; border-radius: 50%;
+  width: 12px; height: 12px; border-radius: 50%;
   border: 2px solid rgba(196,98,45,0.5);
   background: transparent; transition: all 0.15s;
 }
 .pin-dot.filled { background: var(--maple); border-color: var(--maple); }
 .pin-dot.error { background: #e05555; border-color: #e05555; }
 
-.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 280px; }
+.pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 280px; }
 .pin-btn {
   background: var(--wood-mid); border: 1px solid rgba(196,98,45,0.2);
-  border-radius: 12px; padding: 18px 0; text-align: center;
-  font-size: 22px; font-weight: 300; color: var(--cream);
+  border-radius: 12px; padding: 13px 0; text-align: center;
+  font-size: 20px; font-weight: 300; color: var(--cream);
   cursor: pointer; transition: all 0.1s; user-select: none;
   -webkit-user-select: none;
 }
 .pin-btn:active { transform: scale(0.94); background: var(--wood-light); border-color: var(--maple); }
-.pin-btn.del { font-size: 16px; color: var(--maple-light); }
-.pin-btn.cancel-btn { font-size: 13px; color: var(--text-muted); }
-.pin-error-msg { font-size: 13px; color: #e05555; margin-top: -20px; margin-bottom: 8px; min-height: 18px; text-align:center; }
+.pin-btn.del { font-size: 15px; color: var(--maple-light); }
+.pin-btn.cancel-btn { font-size: 12px; color: var(--text-muted); }
+.pin-error-msg { font-size: 12px; color: #e05555; margin-top: -10px; margin-bottom: 6px; min-height: 16px; text-align:center; }
 
 /* ── ACTION SCREEN ── */
 #screen-action .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 0; }
@@ -211,6 +211,11 @@ body::before {
   background: rgba(255,255,255,0.05); color: var(--text-muted);
   cursor: default; border: 1px solid rgba(255,255,255,0.08);
 }
+.btn-marcado {
+  background: rgba(126,200,126,0.12); color: var(--cream);
+  border: 1px solid rgba(126,200,126,0.4);
+}
+.btn-marcado:active { opacity: 0.8; }
 
 /* ── SUCCESS SCREEN ── */
 #screen-success .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
@@ -229,8 +234,8 @@ body::before {
 .auto-back { font-size: 12px; color: var(--text-muted); }
 
 /* ── SETUP PIN SCREEN ── */
-#screen-setup .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-.setup-step { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--maple); margin-bottom: 8px; }
+#screen-setup .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 16px; overflow: hidden; }
+.setup-step { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--maple); margin-bottom: 4px; }
 
 /* ── ADMIN SCREEN ── */
 #screen-admin .content { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -387,11 +392,8 @@ body::before {
       <div><div class="action-status-label">Última entrada</div><div class="action-status-val" id="action-last-entrada">—</div></div>
       <div style="text-align:right"><div class="action-status-label">Última salida</div><div class="action-status-val" id="action-last-salida">—</div></div>
     </div>
-    <div class="action-btns">
-      <button class="action-btn btn-entrada" id="btn-entrada" onclick="doRegistro('entrada')">✓ Registrar entrada</button>
-      <button class="action-btn btn-salida" id="btn-salida" onclick="doRegistro('salida')">↩ Registrar salida</button>
-      <button class="btn-back" onclick="goHome()">Cancelar</button>
-    </div>
+    <div class="action-btns" id="action-btns"></div>
+    <button class="btn-back" onclick="goHome()" style="margin-top:12px">Cancelar</button>
   </div>
 </div>
 
@@ -538,6 +540,12 @@ function tardanzaMin(horaReal, horaEsperada) {
 
 // Calcula horas reales trabajadas en un día con descuento de tardanzas
 // Un registro tiene: entrada (mañana), salida_comida, regreso_comida, salida_final
+function minutosDe(hhmm) {
+  if (!hhmm) return null;
+  const [h,m] = hhmm.split(':').map(Number);
+  return h*60 + m;
+}
+
 function calcDia(r, fecha) {
   if (!r) return { horas: 0, tardMin: 0, extra: 0, horasEsperadas: 0 };
   const hor = getHorarioDia(fecha);
@@ -545,40 +553,35 @@ function calcDia(r, fecha) {
 
   const esSab = (new Date(fecha + 'T12:00:00').getDay() === 6);
 
-  // Minutos de tardanza en entrada mañana
+  // Tardanza de la mañana: solo si hay entrada
   let tardMin = tardanzaMin(r.entrada, hor.t1e);
 
-  // Minutos trabajados reales
   let minutos = 0;
+
   if (esSab) {
-    // Solo un turno
-    if (r.entrada && r.salida_final) {
-      const [eh,em] = r.entrada.split(':').map(Number);
-      const [sh,sm] = r.salida_final.split(':').map(Number);
-      minutos = (sh*60+sm) - (eh*60+em);
-    }
+    const ent = minutosDe(r.entrada);
+    const sal = minutosDe(r.salida_final);
+    if (ent !== null && sal !== null && sal > ent) minutos = sal - ent;
   } else {
-    // Turno mañana
-    const entM = r.entrada;
-    const salM = r.salida_comida || null;
-    if (entM && salM) {
-      const [eh,em] = entM.split(':').map(Number);
-      const [sh,sm] = salM.split(':').map(Number);
-      minutos += (sh*60+sm) - (eh*60+em);
-    }
-    // Turno tarde
-    const entT = r.regreso_comida;
-    const salT = r.salida_final;
-    if (entT && salT) {
-      const [eh,em] = entT.split(':').map(Number);
-      const [sh,sm] = salT.split(':').map(Number);
-      minutos += (sh*60+sm) - (eh*60+em);
-      // Tardanza regreso comida
-      tardMin += tardanzaMin(entT, hor.t2e);
+    const ent = minutosDe(r.entrada);
+    const salC = minutosDe(r.salida_comida);
+    const regC = minutosDe(r.regreso_comida);
+    const salF = minutosDe(r.salida_final);
+
+    // Turno mañana: entrada → salida a comer
+    if (ent !== null && salC !== null && salC > ent) minutos += salC - ent;
+    // Turno tarde: regreso de comida → salida final
+    if (regC !== null && salF !== null && salF > regC) minutos += salF - regC;
+    // Tardanza del regreso de comida (solo si marcó regreso)
+    if (regC !== null) tardMin += tardanzaMin(r.regreso_comida, hor.t2e);
+
+    // Caso: marcó entrada y salida final pero NO la comida (turno corrido sin registrar comida)
+    if (ent !== null && salF !== null && salC === null && regC === null && salF > ent) {
+      minutos = salF - ent;
     }
   }
 
-  const horasTrabajadas = minutos / 60;
+  const horasTrabajadas = Math.max(0, minutos / 60);
   const horasEsperadas = hor.horas;
   const extra = Math.max(0, horasTrabajadas - horasEsperadas);
   return { horas: horasTrabajadas, tardMin, extra, horasEsperadas };
@@ -651,18 +654,16 @@ function renderHome() {
   list.innerHTML = getEmpleados().map(emp => {
     const hasPin = !!data.pins[emp.id];
     const r = getRegistro(emp.id, today);
-    const next = nextTipo(r, today);
     let statusTxt = '', statusClass = '';
     if (!hasPin) { statusTxt = 'Toca para configurar PIN'; statusClass = 'status-out'; }
     else if (!r || !r.entrada) { statusTxt = 'Sin entrada hoy'; statusClass = 'status-out'; }
-    else if (next === 'salida_comida') { statusTxt = `En taller desde ${r.entrada}`; statusClass = 'status-in'; presentes++; }
-    else if (next === 'regreso_comida') { statusTxt = `Comiendo desde ${r.salida_comida}`; statusClass = 'status-out'; }
-    else if (next === 'salida_final') { statusTxt = `Tarde desde ${r.regreso_comida}`; statusClass = 'status-in'; presentes++; }
-    else if (!next) {
+    else if (r.salida_final) {
       const { horas } = calcDia(r, today);
       statusTxt = `Salió ${r.salida_final} · ${fmtH(horas)}`; statusClass = 'status-done'; salidas++;
       totalH += horas;
     }
+    else if (r.salida_comida && !r.regreso_comida) { statusTxt = `Comiendo desde ${r.salida_comida}`; statusClass = 'status-out'; }
+    else { statusTxt = `En taller desde ${r.entrada}`; statusClass = 'status-in'; presentes++; }
     return `<div class="emp-card${!hasPin?' needs-pin':''}" onclick="tapEmpleado(${emp.id})">
       <div class="emp-avatar">${emp.initials}</div>
       <div class="emp-info">
@@ -752,27 +753,37 @@ function goAction(empId) {
   const emp = getEmpleados().find(e => e.id === empId);
   const today = hoy();
   const r = getRegistro(empId, today);
-  const tipo = nextTipo(r, today);
+  const esSab = (new Date(today + 'T12:00:00').getDay() === 6);
   document.getElementById('action-avatar').textContent = emp.initials;
   document.getElementById('action-name').textContent = emp.nombre;
   document.getElementById('action-time-display').textContent = new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'}) + ' · ' + nowStr();
   document.getElementById('action-last-entrada').textContent = r?.entrada || '—';
-  document.getElementById('action-last-salida').textContent = r?.salida_final || (r?.salida_comida ? `Comida: ${r.salida_comida}` : '—');
-  const btnE = document.getElementById('btn-entrada');
-  const btnS = document.getElementById('btn-salida');
-  if (!tipo) {
-    btnE.style.display = 'none';
-    btnS.className = 'action-btn btn-disabled'; btnS.textContent = '✓ Jornada completa'; btnS.onclick = null;
-  } else {
-    btnE.style.display = 'none'; btnS.style.display = 'none';
-    // Show single button for next action
-    btnS.style.display = '';
-    btnS.className = 'action-btn ' + colorTipo(tipo);
-    btnS.textContent = labelTipo(tipo);
-    btnS.onclick = () => doRegistro(tipo);
-    btnE.style.display = 'none';
-  }
+  document.getElementById('action-last-salida').textContent = r?.salida_final || '—';
+
+  // Definir pasos según día. Sábado solo entrada + salida final (sin comida).
+  const pasos = esSab
+    ? [ {tipo:'entrada', label:'Entrada'}, {tipo:'salida_final', label:'Salida final'} ]
+    : [ {tipo:'entrada', label:'Entrada'}, {tipo:'salida_comida', label:'Salida a comer'}, {tipo:'regreso_comida', label:'Regreso de comida'}, {tipo:'salida_final', label:'Salida final'} ];
+
+  const cont = document.getElementById('action-btns');
+  cont.innerHTML = pasos.map(p => {
+    const marcado = r && r[p.tipo];
+    const esEntradaTipo = (p.tipo === 'entrada' || p.tipo === 'regreso_comida');
+    const colorClass = esEntradaTipo ? 'btn-entrada' : 'btn-salida';
+    if (marcado) {
+      return '<button class="action-btn btn-marcado" onclick="confirmarReemplazo(' + "'" + p.tipo + "'" + ',' + "'" + p.label + "'" + ')">' +
+        '<span style="display:flex;justify-content:space-between;align-items:center;width:100%"><span>' + p.label + '</span><span style="font-size:13px;opacity:0.85">' + r[p.tipo] + ' ✓</span></span></button>';
+    }
+    return '<button class="action-btn ' + colorClass + '" onclick="doRegistro(' + "'" + p.tipo + "'" + ')">' + p.label + '</button>';
+  }).join('');
+
   showScreen('action');
+}
+
+function confirmarReemplazo(tipo, label) {
+  if (confirm('Ya hay un registro de "' + label + '". ¿Reemplazarlo con la hora actual (' + nowStr() + ')?')) {
+    doRegistro(tipo);
+  }
 }
 
 function doRegistro(tipo) {
@@ -893,12 +904,13 @@ function renderAdminContent() {
       } else {
         cells = `<td style="color:#7EC87E;font-size:11px">${r.entrada||'—'}</td><td style="color:var(--maple-light);font-size:11px">${r.salida_comida||'—'}</td><td style="color:#7EC87E;font-size:11px">${r.regreso_comida||'—'}</td><td style="color:var(--maple-light);font-size:11px">${r.salida_final||'—'}</td>`;
       }
-      return `<tr style="${isToday?'background:rgba(196,98,45,0.08)':''}">
+      return `<tr style="${isToday?'background:rgba(196,98,45,0.08)':''};cursor:pointer" onclick="editarDia(${emp.id},'${d}')">
         <td style="font-size:11px;color:var(--text-muted);white-space:nowrap">${diasLabel[i]} ${d.slice(5)}</td>
         ${cells}
         <td style="font-size:11px;font-weight:500;color:var(--gold)">${horas>0?fmtH(horas):'—'}</td>
         <td style="font-size:11px;color:#e08585">${tardMin>0?'-'+fmtMin(tardMin):''}</td>
         <td style="font-size:11px;color:var(--gold)">${extra>0?'+'+fmtH(extra):''}</td>
+        <td style="font-size:13px;color:var(--maple-light);text-align:center">✎</td>
       </tr>`;
     }).join('');
 
@@ -923,6 +935,7 @@ function renderAdminContent() {
           <th style="font-size:10px;color:var(--gold);padding:4px;font-weight:500">Hrs</th>
           <th style="font-size:10px;color:#e08585;padding:4px;font-weight:500">Tard</th>
           <th style="font-size:10px;color:var(--gold);padding:4px;font-weight:500">Extra</th>
+          <th style="font-size:10px;color:var(--maple-light);padding:4px;font-weight:500"></th>
         </tr></thead>
         <tbody>${filas}</tbody>
         <tfoot><tr style="border-top:1px solid rgba(196,98,45,0.3)">
@@ -930,6 +943,7 @@ function renderAdminContent() {
           <td style="font-size:12px;font-weight:500;color:var(--gold);padding:6px 4px">${fmtH(empHoras)}</td>
           <td style="font-size:12px;color:#e08585;padding:6px 4px">${empTard>0?'-'+fmtMin(empTard):''}</td>
           <td style="font-size:12px;color:var(--gold);padding:6px 4px">${empExtra>0?'+'+fmtH(empExtra):''}</td>
+          <td></td>
         </tr></tfoot>
       </table></div>
       <div class="admin-btn-row">
@@ -953,6 +967,13 @@ function renderAdminContent() {
     '</div>';
   html += `<button class="export-btn" onclick="exportCSV()">⬇ Exportar semana CSV</button>`;
   html += '<button onclick="cambiarAdminPin()" style="width:100%;background:transparent;border:1px solid rgba(196,98,45,0.3);border-radius:12px;padding:13px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;">🔑 Cambiar PIN de administrador</button>';
+  html += '<div style="background:var(--wood-mid);border:1px solid rgba(196,98,45,0.2);border-radius:12px;padding:14px 16px;margin-top:4px;">' +
+    '<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--maple-light);margin-bottom:4px;">Respaldo de datos</div>' +
+    '<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.4;">Descarga un respaldo cada semana. Guárdalo en tu correo o PC por seguridad.</div>' +
+    '<div style="display:flex;gap:8px;">' +
+    '<button onclick="respaldarDatos()" style="flex:1;background:rgba(126,200,126,0.12);border:1px solid rgba(126,200,126,0.35);border-radius:10px;padding:12px;font-size:13px;font-weight:500;color:#9BD89B;cursor:pointer;font-family:inherit;">💾 Descargar respaldo</button>' +
+    '<button onclick="restaurarDatos()" style="flex:1;background:transparent;border:1px solid rgba(196,98,45,0.3);border-radius:10px;padding:12px;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:inherit;">📂 Restaurar</button>' +
+    '</div></div>';
   cont.innerHTML = html;
 }
 
@@ -960,20 +981,64 @@ function resetPin(empId) {
   const emp = getEmpleados().find(e => e.id === empId);
   if (confirm('¿Resetear PIN de ' + emp.nombre + '?')) { delete data.pins[empId]; save(); renderAdminContent(); }
 }
-function editarHoy(empId) {
+function validarHora(str) {
+  if (!str || str.trim() === '') return { ok: true, valor: null };
+  const t = str.trim();
+  if (!/^\d{1,2}:\d{2}$/.test(t)) return { ok: false };
+  const [h, m] = t.split(':').map(Number);
+  if (h < 0 || h > 23 || m < 0 || m > 59) return { ok: false };
+  const hh = h.toString().padStart(2, '0');
+  return { ok: true, valor: hh + ':' + m.toString().padStart(2, '0') };
+}
+
+function editarDia(empId, fecha) {
   const emp = getEmpleados().find(e => e.id === empId);
-  const today = hoy();
-  let r = getOrCreateRegistro(empId, today);
-  const e = prompt('Entrada ' + emp.nombre + ':', r.entrada || '');
+  const esSab = (new Date(fecha + 'T12:00:00').getDay() === 6);
+  const fechaLabel = new Date(fecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
+  let r = getOrCreateRegistro(empId, fecha);
+
+  const aviso = 'Editar registro de ' + emp.nombre + '\n' + fechaLabel + '\n\nFormato 24h (ej. 08:00, 14:30).\nDeja vacío para borrar ese registro.';
+
+  const e = prompt(aviso + '\n\n— ENTRADA —', r.entrada || '');
   if (e === null) return;
-  const sc = prompt('Salida a comer:', r.salida_comida || '');
-  if (sc === null) return;
-  const rc = prompt('Regreso de comer:', r.regreso_comida || '');
-  if (rc === null) return;
-  const sf = prompt('Salida final:', r.salida_final || '');
+  const ve = validarHora(e);
+  if (!ve.ok) { alert('Hora de entrada inválida. Usa formato HH:MM (ej. 08:00).'); return; }
+
+  let vsc = { valor: null }, vrc = { valor: null };
+  if (!esSab) {
+    const sc = prompt('— SALIDA A COMER —', r.salida_comida || '');
+    if (sc === null) return;
+    vsc = validarHora(sc);
+    if (!vsc.ok) { alert('Hora de salida a comer inválida.'); return; }
+
+    const rc = prompt('— REGRESO DE COMER —', r.regreso_comida || '');
+    if (rc === null) return;
+    vrc = validarHora(rc);
+    if (!vrc.ok) { alert('Hora de regreso inválida.'); return; }
+  }
+
+  const sf = prompt('— SALIDA FINAL —', r.salida_final || '');
   if (sf === null) return;
-  r.entrada = e||null; r.salida_comida = sc||null; r.regreso_comida = rc||null; r.salida_final = sf||null;
-  save(); renderAdminContent();
+  const vsf = validarHora(sf);
+  if (!vsf.ok) { alert('Hora de salida final inválida.'); return; }
+
+  r.entrada = ve.valor;
+  r.salida_comida = vsc.valor;
+  r.regreso_comida = vrc.valor;
+  r.salida_final = vsf.valor;
+
+  // Mostrar resultado calculado para confirmar
+  const res = calcDia(r, fecha);
+  save();
+  renderAdminContent();
+  let resumen = 'Registro actualizado.\n\nHoras trabajadas: ' + fmtH(res.horas);
+  if (res.tardMin > 0) resumen += '\nTardanza: ' + fmtMin(res.tardMin);
+  if (res.extra > 0) resumen += '\nHoras extra: ' + fmtH(res.extra);
+  alert('\u2705 ' + resumen);
+}
+
+function editarHoy(empId) {
+  editarDia(empId, hoy());
 }
 // ── EMAIL RECOVERY ──
 function generarCodigo() {
@@ -1118,6 +1183,48 @@ function exportNomina() {
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
   a.download = 'bigmaple_nomina_' + hoy() + '.csv';
   a.click();
+}
+
+function respaldarDatos() {
+  const respaldo = JSON.stringify(data, null, 2);
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(respaldo);
+  a.download = 'bigmaple_respaldo_' + hoy() + '.json';
+  a.click();
+  alert('\u2705 Respaldo descargado.\n\nGuárdalo en tu correo o PC. Contiene empleados, PINs, historial y nómina.');
+}
+
+function restaurarDatos() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const restaurado = JSON.parse(ev.target.result);
+        if (!restaurado.registros && !restaurado.empleados && !restaurado.pins) {
+          alert('\u274C El archivo no parece un respaldo válido de Big Maple.');
+          return;
+        }
+        if (!confirm('\u26A0\uFE0F Esto reemplazará TODOS los datos actuales del celular con los del respaldo.\n\n¿Continuar?')) return;
+        data = restaurado;
+        if (!data.pins) data.pins = {};
+        if (!data.registros) data.registros = [];
+        if (data.adminPin) ADMIN_PIN = data.adminPin;
+        save();
+        alert('\u2705 Datos restaurados correctamente.');
+        renderAdminContent();
+        renderHome();
+      } catch (err) {
+        alert('\u274C Error al leer el archivo. Asegúrate de que sea un respaldo de Big Maple.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
 }
 
 function exportCSV() {
