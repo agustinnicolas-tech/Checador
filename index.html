@@ -688,7 +688,13 @@ if (data.adminPin) ADMIN_PIN = data.adminPin;
 // data.recoveryCode stores the current valid recovery code
 function save() { localStorage.setItem('bmf_data', JSON.stringify(data)); }
 
-function hoy() { return new Date().toISOString().split('T')[0]; }
+function hoy() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
+}
 function nowStr() { return new Date().toTimeString().slice(0,5); }
 function fmtH(h) { if (h === null || isNaN(h) || h <= 0) return '—'; return h.toFixed(1) + 'h'; }
 
@@ -984,10 +990,16 @@ function adminPinPress(n) {
 }
 function adminPinDel() { if (adminPinBuffer.length) { adminPinBuffer = adminPinBuffer.slice(0,-1); renderAdminDots(); } }
 
+function fechaLocal(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + dd;
+}
 function semanaActual() {
   const d = new Date(); const dow = d.getDay();
   const lun = new Date(d); lun.setDate(d.getDate() - (dow===0?6:dow-1));
-  return Array.from({length:6}, (_,i) => { const x = new Date(lun); x.setDate(lun.getDate()+i); return x.toISOString().split('T')[0]; });
+  return Array.from({length:6}, (_,i) => { const x = new Date(lun); x.setDate(lun.getDate()+i); return fechaLocal(x); });
 }
 
 function renderAdminContent() {
