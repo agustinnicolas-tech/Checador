@@ -915,13 +915,8 @@ function renderAdminContent() {
   const today = hoy();
   const diasLabel = ['Lun','Mar','Mié','Jue','Vie','Sáb'];
   const cont = document.getElementById('admin-content');
-  let html = `<div style="background:rgba(196,98,45,0.08);border:1px solid rgba(196,98,45,0.25);border-radius:12px;padding:14px 16px;margin-bottom:4px;">
-    <div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--maple-light);margin-bottom:10px;">Resumen semanal</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;">
-      <div><div style="font-size:11px;color:var(--text-muted)">Semana base</div><div style="font-size:18px;font-weight:500">${SEMANA_HORAS}h</div></div>`;
+  // Calcular totales de la semana
   let totalRealSem = 0, totalTardSem = 0, totalExtraSem = 0;
-  html += renderNomina();
-
   getEmpleados().forEach(emp => {
     dias.forEach(d => {
       const r = getRegistro(emp.id, d);
@@ -929,10 +924,40 @@ function renderAdminContent() {
       totalRealSem += horas; totalTardSem += tardMin; totalExtraSem += extra;
     });
   });
-  html += `<div><div style="font-size:11px;color:var(--text-muted)">Hrs trabajadas</div><div style="font-size:18px;font-weight:500">${(totalRealSem/getEmpleados().length).toFixed(1)}h</div><div style="font-size:10px;color:var(--text-muted)">promedio</div></div>
-      <div><div style="font-size:11px;color:var(--text-muted)">Tardanzas</div><div style="font-size:18px;font-weight:500;color:#e08585">${fmtMin(totalTardSem)}</div></div>
-      <div><div style="font-size:11px;color:var(--text-muted)">Horas extra</div><div style="font-size:18px;font-weight:500;color:var(--gold)">${totalExtraSem.toFixed(1)}h</div></div>
-    </div></div>`;
+  const numEmp = getEmpleados().length || 1;
+  const promedioHrs = (totalRealSem / numEmp);
+  const metaSemanal = SEMANA_HORAS * numEmp;
+  const avancePct = metaSemanal > 0 ? Math.min(100, Math.round((totalRealSem / metaSemanal) * 100)) : 0;
+
+  // Tarjetas con íconos y colores por indicador
+  const tarjeta = (icono, etiqueta, valor, color, bg) =>
+    '<div style="background:' + bg + ';border:1px solid ' + color + '33;border-radius:12px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;">' +
+      '<div style="font-size:22px;line-height:1">' + icono + '</div>' +
+      '<div style="font-size:19px;font-weight:700;color:' + color + ';line-height:1.1">' + valor + '</div>' +
+      '<div style="font-size:10px;color:var(--text-muted);text-align:center;letter-spacing:.03em">' + etiqueta + '</div>' +
+    '</div>';
+
+  let html = '<div style="background:rgba(196,98,45,0.06);border:1px solid rgba(196,98,45,0.2);border-radius:14px;padding:16px;margin-bottom:6px;">' +
+    '<div style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--maple-light);margin-bottom:14px;">Resumen semanal</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">' +
+      tarjeta('\u23F1\uFE0F', 'Horas trabajadas (total)', totalRealSem.toFixed(1) + 'h', '#9BD89B', 'rgba(126,200,126,0.10)') +
+      tarjeta('\u2728', 'Horas extra (total)', '+' + totalExtraSem.toFixed(1) + 'h', '#D4A847', 'rgba(212,168,71,0.10)') +
+      tarjeta('\u23F0', 'Tardanzas acumuladas', fmtMin(totalTardSem), '#e08585', 'rgba(224,133,133,0.10)') +
+      tarjeta('\u{1F4CA}', 'Promedio por empleado', promedioHrs.toFixed(1) + 'h', '#E8874F', 'rgba(232,135,79,0.10)') +
+    '</div>' +
+    // Barra de avance de la semana
+    '<div style="margin-top:4px;">' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:5px;">' +
+        '<span>Avance de la semana</span><span>' + totalRealSem.toFixed(1) + 'h / ' + metaSemanal.toFixed(1) + 'h</span>' +
+      '</div>' +
+      '<div style="background:rgba(0,0,0,0.2);border-radius:8px;height:10px;overflow:hidden;">' +
+        '<div style="width:' + avancePct + '%;height:100%;background:linear-gradient(90deg,var(--maple),var(--maple-light));border-radius:8px;transition:width .4s"></div>' +
+      '</div>' +
+      '<div style="text-align:right;font-size:10px;color:var(--maple-light);margin-top:3px;">' + avancePct + '% completado</div>' +
+    '</div>' +
+  '</div>';
+
+  html += renderNomina();
 
   getEmpleados().forEach(emp => {
     let empHoras = 0, empTard = 0, empExtra = 0;
@@ -992,9 +1017,10 @@ function renderAdminContent() {
           <td></td>
         </tr></tfoot>
       </table></div>
+      <div style="font-size:11px;color:var(--text-muted);text-align:center;margin:6px 0 2px;font-style:italic">Toca cualquier fila para editar ese día</div>
       <div class="admin-btn-row">
         <button class="admin-btn danger" onclick="resetPin(${emp.id})">Resetear PIN</button>
-        <button class="admin-btn" onclick="editarHoy(${emp.id})">Editar hoy</button>
+        <button class="admin-btn" onclick="elegirDiaEditar(${emp.id})">✎ Editar un día</button>
       </div>
     </div>`;
   });
@@ -1085,6 +1111,23 @@ function editarDia(empId, fecha) {
 
 function editarHoy(empId) {
   editarDia(empId, hoy());
+}
+
+function elegirDiaEditar(empId) {
+  const emp = getEmpleados().find(e => e.id === empId);
+  const dias = semanaActual();
+  const diasLabel = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const today = hoy();
+  let opciones = 'Editar registro de ' + emp.nombre + '\n\nEscribe el número del día a editar:\n\n';
+  dias.forEach((d, i) => {
+    const marca = (d === today) ? ' (hoy)' : '';
+    opciones += (i+1) + '. ' + diasLabel[i] + ' ' + d.slice(5) + marca + '\n';
+  });
+  const sel = prompt(opciones);
+  if (sel === null) return;
+  const n = parseInt(sel.trim());
+  if (isNaN(n) || n < 1 || n > 6) { alert('Número inválido. Escribe del 1 al 6.'); return; }
+  editarDia(empId, dias[n-1]);
 }
 // ── EMAIL RECOVERY ──
 function generarCodigo() {
