@@ -278,6 +278,69 @@ body::before {
 .screen.active { animation: fadeIn 0.2s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
 .shake { animation: shake 0.4s ease; }
+
+/* ── MODAL DE EDICIÓN ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(10,6,2,0.75); backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center;
+  padding: 16px; animation: fadeIn 0.2s ease;
+}
+.modal-overlay.active { display: flex; }
+.modal-card {
+  background: var(--wood); border: 1px solid rgba(196,98,45,0.35);
+  border-radius: 18px; width: 100%; max-width: 380px;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.modal-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px; border-bottom: 1px solid rgba(196,98,45,0.2);
+  position: sticky; top: 0; background: var(--wood); border-radius: 18px 18px 0 0;
+}
+.modal-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--maple-dark), var(--maple));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700;
+  color: var(--cream); flex-shrink: 0;
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--cream); line-height: 1.2; }
+.modal-sub { font-size: 12px; color: var(--maple-light); }
+.modal-close { margin-left: auto; background: none; border: none; color: var(--text-muted); font-size: 26px; cursor: pointer; line-height: 1; padding: 0 4px; }
+.modal-body { padding: 16px 18px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-size: 12px; font-weight: 500; color: var(--maple-light); margin-bottom: 6px; letter-spacing: 0.03em; }
+.modal-field input[type=time] {
+  width: 100%; background: var(--wood-mid); border: 1px solid rgba(196,98,45,0.25);
+  border-radius: 10px; padding: 12px 14px; font-size: 16px; color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+}
+.modal-field input[type=time]:focus { outline: none; border-color: var(--maple); }
+.modal-daygrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.modal-daybtn {
+  background: var(--wood-mid); border: 1px solid rgba(196,98,45,0.25);
+  border-radius: 10px; padding: 14px 10px; text-align: center; cursor: pointer;
+  color: var(--cream); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+  transition: all 0.12s;
+}
+.modal-daybtn:active { transform: scale(0.97); background: var(--wood-light); }
+.modal-daybtn .dia-fecha { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; font-weight: 400; }
+.modal-daybtn.hoy { border-color: var(--maple); background: rgba(196,98,45,0.12); }
+.modal-foot { padding: 12px 18px 18px; display: flex; gap: 10px; }
+.modal-btn {
+  flex: 1; border-radius: 12px; padding: 13px; font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; border: none;
+}
+.modal-btn-save { background: linear-gradient(135deg, var(--maple-dark), var(--maple)); color: var(--cream); }
+.modal-btn-save:active { opacity: 0.85; }
+.modal-btn-cancel { background: transparent; border: 1px solid rgba(196,98,45,0.3); color: var(--text-muted); }
+.modal-result {
+  background: rgba(126,200,126,0.10); border: 1px solid rgba(126,200,126,0.3);
+  border-radius: 10px; padding: 12px 14px; font-size: 13px; color: var(--cream);
+  margin: 0 18px 14px; line-height: 1.6;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
@@ -456,6 +519,23 @@ body::before {
   <div class="nav-bar">
     <div class="nav-btn" onclick="showHome()"><div class="nav-icon">🏠</div><div class="nav-label">Inicio</div></div>
     <div class="nav-btn active"><div class="nav-icon">📋</div><div class="nav-label">Registros</div></div>
+  </div>
+</div>
+
+<!-- MODAL DE EDICIÓN -->
+<div id="modal-edit" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-avatar" id="modal-avatar"></div>
+      <div>
+        <div class="modal-title" id="modal-title">Editar</div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="cerrarModal()">&times;</button>
+    </div>
+    <div id="modal-body" class="modal-body"></div>
+    <div id="modal-result" class="modal-result" style="display:none"></div>
+    <div id="modal-foot" class="modal-foot"></div>
   </div>
 </div>
 
@@ -1020,7 +1100,7 @@ function renderAdminContent() {
       <div style="font-size:11px;color:var(--text-muted);text-align:center;margin:6px 0 2px;font-style:italic">Toca cualquier fila para editar ese día</div>
       <div class="admin-btn-row">
         <button class="admin-btn danger" onclick="resetPin(${emp.id})">Resetear PIN</button>
-        <button class="admin-btn" onclick="elegirDiaEditar(${emp.id})">✎ Editar un día</button>
+        <button class="admin-btn" onclick="elegirDiaEditar(${emp.id})">✎ Editar</button>
       </div>
     </div>`;
   });
@@ -1064,70 +1144,91 @@ function validarHora(str) {
 }
 
 function editarDia(empId, fecha) {
+  modalEmpId = empId;
   const emp = getEmpleados().find(e => e.id === empId);
   const esSab = (new Date(fecha + 'T12:00:00').getDay() === 6);
   const fechaLabel = new Date(fecha + 'T12:00:00').toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
-  let r = getOrCreateRegistro(empId, fecha);
+  const r = getRegistro(empId, fecha) || { entrada:null, salida_comida:null, regreso_comida:null, salida_final:null };
 
-  const aviso = 'Editar registro de ' + emp.nombre + '\n' + fechaLabel + '\n\nFormato 24h (ej. 08:00, 14:30).\nDeja vacío para borrar ese registro.';
+  document.getElementById('modal-avatar').textContent = emp.initials;
+  document.getElementById('modal-title').textContent = emp.nombre;
+  document.getElementById('modal-sub').textContent = fechaLabel;
+  document.getElementById('modal-result').style.display = 'none';
 
-  const e = prompt(aviso + '\n\n— ENTRADA —', r.entrada || '');
-  if (e === null) return;
-  const ve = validarHora(e);
-  if (!ve.ok) { alert('Hora de entrada inválida. Usa formato HH:MM (ej. 08:00).'); return; }
+  const campo = (id, label, val) =>
+    '<div class="modal-field"><label>' + label + '</label>' +
+    '<input type="time" id="' + id + '" value="' + (val || '') + '"></div>';
 
-  let vsc = { valor: null }, vrc = { valor: null };
+  let body = campo('edit-entrada', 'Entrada', r.entrada);
   if (!esSab) {
-    const sc = prompt('— SALIDA A COMER —', r.salida_comida || '');
-    if (sc === null) return;
-    vsc = validarHora(sc);
-    if (!vsc.ok) { alert('Hora de salida a comer inválida.'); return; }
-
-    const rc = prompt('— REGRESO DE COMER —', r.regreso_comida || '');
-    if (rc === null) return;
-    vrc = validarHora(rc);
-    if (!vrc.ok) { alert('Hora de regreso inválida.'); return; }
+    body += campo('edit-salida_comida', 'Salida a comer', r.salida_comida);
+    body += campo('edit-regreso_comida', 'Regreso de comida', r.regreso_comida);
   }
+  body += campo('edit-salida_final', 'Salida final', r.salida_final);
+  body += '<div style="font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:2px">Deja un campo vacío para borrar ese registro.</div>';
 
-  const sf = prompt('— SALIDA FINAL —', r.salida_final || '');
-  if (sf === null) return;
-  const vsf = validarHora(sf);
-  if (!vsf.ok) { alert('Hora de salida final inválida.'); return; }
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-foot').innerHTML =
+    '<button class="modal-btn modal-btn-cancel" onclick="cerrarModal()">Cancelar</button>' +
+    '<button class="modal-btn modal-btn-save" onclick="guardarEdicion(' + empId + ',' + "'" + fecha + "'" + ',' + esSab + ')">Guardar</button>';
+  document.getElementById('modal-edit').classList.add('active');
+}
 
-  r.entrada = ve.valor;
-  r.salida_comida = vsc.valor;
-  r.regreso_comida = vrc.valor;
-  r.salida_final = vsf.valor;
+function guardarEdicion(empId, fecha, esSab) {
+  const getVal = id => { const el = document.getElementById(id); return el ? (el.value || null) : null; };
+  const r = getOrCreateRegistro(empId, fecha);
+  r.entrada = getVal('edit-entrada');
+  r.salida_comida = esSab ? null : getVal('edit-salida_comida');
+  r.regreso_comida = esSab ? null : getVal('edit-regreso_comida');
+  r.salida_final = getVal('edit-salida_final');
 
-  // Mostrar resultado calculado para confirmar
   const res = calcDia(r, fecha);
   save();
   renderAdminContent();
-  let resumen = 'Registro actualizado.\n\nHoras trabajadas: ' + fmtH(res.horas);
-  if (res.tardMin > 0) resumen += '\nTardanza: ' + fmtMin(res.tardMin);
-  if (res.extra > 0) resumen += '\nHoras extra: ' + fmtH(res.extra);
-  alert('\u2705 ' + resumen);
+
+  // Mostrar resultado dentro del modal
+  let resumen = '\u2705 Registro actualizado.<br>Horas trabajadas: <b>' + fmtH(res.horas) + '</b>';
+  if (res.tardMin > 0) resumen += '<br>Tardanza: <b style="color:#e08585">' + fmtMin(res.tardMin) + '</b>';
+  if (res.extra > 0) resumen += '<br>Horas extra: <b style="color:var(--gold)">' + fmtH(res.extra) + '</b>';
+  const resEl = document.getElementById('modal-result');
+  resEl.innerHTML = resumen;
+  resEl.style.display = 'block';
+  document.getElementById('modal-foot').innerHTML =
+    '<button class="modal-btn modal-btn-save" onclick="cerrarModal()">Listo</button>';
 }
 
 function editarHoy(empId) {
   editarDia(empId, hoy());
 }
 
+let modalEmpId = null;
+
+function cerrarModal() {
+  document.getElementById('modal-edit').classList.remove('active');
+}
+
 function elegirDiaEditar(empId) {
+  modalEmpId = empId;
   const emp = getEmpleados().find(e => e.id === empId);
   const dias = semanaActual();
   const diasLabel = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const today = hoy();
-  let opciones = 'Editar registro de ' + emp.nombre + '\n\nEscribe el número del día a editar:\n\n';
-  dias.forEach((d, i) => {
-    const marca = (d === today) ? ' (hoy)' : '';
-    opciones += (i+1) + '. ' + diasLabel[i] + ' ' + d.slice(5) + marca + '\n';
-  });
-  const sel = prompt(opciones);
-  if (sel === null) return;
-  const n = parseInt(sel.trim());
-  if (isNaN(n) || n < 1 || n > 6) { alert('Número inválido. Escribe del 1 al 6.'); return; }
-  editarDia(empId, dias[n-1]);
+
+  document.getElementById('modal-avatar').textContent = emp.initials;
+  document.getElementById('modal-title').textContent = emp.nombre;
+  document.getElementById('modal-sub').textContent = 'Elige el día a editar';
+  document.getElementById('modal-result').style.display = 'none';
+
+  const grid = dias.map((d, i) => {
+    const esHoy = d === today;
+    return '<div class="modal-daybtn' + (esHoy ? ' hoy' : '') + '" onclick="editarDia(' + empId + ',' + "'" + d + "'" + ')">' +
+      diasLabel[i] + (esHoy ? ' (hoy)' : '') +
+      '<span class="dia-fecha">' + d.slice(5) + '</span></div>';
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML = '<div class="modal-daygrid">' + grid + '</div>';
+  document.getElementById('modal-foot').innerHTML = '<button class="modal-btn modal-btn-cancel" onclick="cerrarModal()">Cerrar</button>';
+  document.getElementById('modal-edit').classList.add('active');
 }
 // ── EMAIL RECOVERY ──
 function generarCodigo() {
