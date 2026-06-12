@@ -343,6 +343,7 @@ body::before {
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -1369,8 +1370,94 @@ function renderNomina() {
       '<td style="padding:10px 6px;font-size:16px;font-weight:700;text-align:right;color:var(--gold)">' + fmtMXN(totalNomina) + '</td>' +
     '</tr></tfoot>' +
     '</table></div>' +
-    '<button onclick="exportNomina()" style="width:100%;margin-top:12px;background:rgba(212,168,71,0.12);border:1px solid rgba(212,168,71,0.3);border-radius:10px;padding:11px;font-size:13px;font-weight:500;color:var(--gold);cursor:pointer;font-family:inherit;">⬇ Exportar nómina CSV</button>' +
+    '<button onclick="exportExcel()" style="width:100%;margin-top:12px;background:rgba(126,200,126,0.15);border:1px solid rgba(126,200,126,0.4);border-radius:10px;padding:13px;font-size:14px;font-weight:600;color:#9BD89B;cursor:pointer;font-family:inherit;">📊 Descargar reporte Excel (sábados)</button>' +
+    '<button onclick="exportNomina()" style="width:100%;margin-top:8px;background:rgba(212,168,71,0.12);border:1px solid rgba(212,168,71,0.3);border-radius:10px;padding:11px;font-size:13px;font-weight:500;color:var(--gold);cursor:pointer;font-family:inherit;">⬇ Exportar nómina CSV</button>' +
     '</div>';
+}
+
+function exportExcel() {
+  if (typeof XLSX === 'undefined') {
+    alert('No se pudo cargar el generador de Excel. Verifica tu conexión a internet e intenta de nuevo.');
+    return;
+  }
+  const dias = semanaActual();
+  const diasLabel = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const emps = getEmpleados();
+  const wb = XLSX.utils.book_new();
+
+  // ── HOJA RESUMEN ──
+  const resumen = [];
+  resumen.push(['BIG MAPLE FURNITURE — Reporte semanal']);
+  resumen.push(['Semana:', dias[0] + ' al ' + dias[5]]);
+  resumen.push([]);
+  resumen.push(['Empleado', 'Horas trabajadas', 'Tardanza (min)', 'Horas extra', 'Salario base', 'Descuento', 'Pago extra', 'Total a pagar']);
+  let granTotal = 0;
+  emps.forEach(emp => {
+    const n = calcNomina(emp, dias);
+    granTotal += n.totalNeto;
+    resumen.push([
+      emp.nombre,
+      Number(n.horasTrabajadas.toFixed(2)),
+      n.tardMin,
+      Number(n.horasExtra.toFixed(2)),
+      Number((emp.salario||0).toFixed(2)),
+      Number(n.descuento.toFixed(2)),
+      Number(n.pagoExtra.toFixed(2)),
+      Number(n.totalNeto.toFixed(2))
+    ]);
+  });
+  resumen.push([]);
+  resumen.push(['', '', '', '', '', '', 'TOTAL NÓMINA:', Number(granTotal.toFixed(2))]);
+  const wsResumen = XLSX.utils.aoa_to_sheet(resumen);
+  wsResumen['!cols'] = [{wch:20},{wch:16},{wch:14},{wch:12},{wch:13},{wch:12},{wch:12},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+
+  // ── HOJA POR EMPLEADO ──
+  emps.forEach(emp => {
+    const n = calcNomina(emp, dias);
+    const aoa = [];
+    aoa.push(['BIG MAPLE FURNITURE']);
+    aoa.push([emp.nombre]);
+    aoa.push(['Semana:', dias[0] + ' al ' + dias[5]]);
+    aoa.push([]);
+    aoa.push(['Día', 'Fecha', 'Entrada', 'Salida a comer', 'Regreso comida', 'Salida final', 'Horas', 'Tardanza (min)', 'Hrs extra']);
+    dias.forEach((d, i) => {
+      const r = getRegistro(emp.id, d);
+      const res = calcDia(r, d);
+      aoa.push([
+        diasLabel[i],
+        d,
+        (r && r.entrada) || '',
+        (r && r.salida_comida) || '',
+        (r && r.regreso_comida) || '',
+        (r && r.salida_final) || '',
+        res.horas > 0 ? Number(res.horas.toFixed(2)) : '',
+        res.tardMin || '',
+        res.extra > 0 ? Number(res.extra.toFixed(2)) : ''
+      ]);
+    });
+    aoa.push([]);
+    aoa.push(['TOTALES', '', '', '', '', '', Number(n.horasTrabajadas.toFixed(2)), n.tardMin, Number(n.horasExtra.toFixed(2))]);
+    aoa.push([]);
+    aoa.push([]);
+    aoa.push(['DESGLOSE DEL SALARIO']);
+    aoa.push(['Salario base semanal', Number((emp.salario||0).toFixed(2))]);
+    aoa.push(['Tardanza acumulada', n.tardMin + ' min']);
+    aoa.push(['Descuento por tardanza', '-' + n.descuento.toFixed(2)]);
+    aoa.push(['Horas extra', Number(n.horasExtra.toFixed(2)) + ' h']);
+    aoa.push(['Tarifa hora extra', Number((emp.hrExtra||0).toFixed(2))]);
+    aoa.push(['Pago por horas extra', '+' + n.pagoExtra.toFixed(2)]);
+    aoa.push([]);
+    aoa.push(['TOTAL A PAGAR (MXN)', Number(n.totalNeto.toFixed(2))]);
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:22},{wch:14},{wch:12},{wch:14},{wch:14},{wch:13},{wch:10},{wch:14},{wch:10}];
+    // Nombre de hoja: máximo 31 caracteres, sin caracteres inválidos
+    let nombreHoja = emp.nombre.replace(/[\\\/\?\*\[\]:]/g, '').slice(0, 31);
+    XLSX.utils.book_append_sheet(wb, ws, nombreHoja);
+  });
+
+  XLSX.writeFile(wb, 'BigMaple_reporte_' + hoy() + '.xlsx');
 }
 
 function exportNomina() {
