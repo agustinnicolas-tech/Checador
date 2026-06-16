@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Big Maple">
 <link rel="manifest" href="manifest.json">
 <title>Big Maple Furniture</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" onerror="this.remove()">
 <style>
 :root {
   --maple: #C4622D;
@@ -342,8 +342,8 @@ body::before {
 }
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer onerror="window._emailjsFailed=true"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer onerror="window._xlsxFailed=true"></script>
 </head>
 <body>
 
@@ -542,10 +542,11 @@ body::before {
 
 <script>
 const EMPLEADOS_DEFAULT = [
-  { id: 1, nombre: 'Miguel García',   initials: 'MG', salario: 2900, hrExtra: 100 },
-  { id: 2, nombre: 'Cirilo Isidro',   initials: 'CI', salario: 2600, hrExtra: 100 },
-  { id: 3, nombre: 'Adolfo Rojas',    initials: 'AR', salario: 1700, hrExtra: 70  },
-  { id: 4, nombre: 'Luis Hernández',  initials: 'LH', salario: 1800, hrExtra: 80  },
+  { id: 1, nombre: 'Miguel García',              initials: 'MG', salario: 2900, hrExtra: 100 },
+  { id: 2, nombre: 'Cirilo Isidro',              initials: 'CI', salario: 2600, hrExtra: 100 },
+  { id: 4, nombre: 'Luis Hernández',             initials: 'LH', salario: 1800, hrExtra: 80  },
+  { id: 5, nombre: 'Sergio Nicolás Tecozautla',  initials: 'ST', salario: 1800, hrExtra: 80  },
+  { id: 6, nombre: 'Abraham Manuel Nicolás Hernández', initials: 'AH', salario: 1800, hrExtra: 80 },
 ];
 let ADMIN_PIN = '1234';
 
@@ -1249,6 +1250,10 @@ function generarCodigo() {
 }
 
 function enviarCodigoRecuperacion() {
+  if (typeof emailjs === 'undefined' || !navigator.onLine) {
+    alert('La recuperación de PIN por correo necesita conexión a internet.\n\nConéctate a una red e intenta de nuevo.');
+    return;
+  }
   const codigo = generarCodigo();
   data.recoveryCode = codigo;
   data.recoveryExpiry = Date.now() + 30 * 60 * 1000; // 30 minutos
@@ -1377,7 +1382,7 @@ function renderNomina() {
 
 function exportExcel() {
   if (typeof XLSX === 'undefined') {
-    alert('No se pudo cargar el generador de Excel. Verifica tu conexión a internet e intenta de nuevo.');
+    alert('El reporte Excel necesita conexión a internet la primera vez (para cargar el generador).\n\nConéctate a una red e intenta de nuevo. Mientras tanto, puedes usar "Exportar nómina CSV", que funciona sin internet.');
     return;
   }
   const dias = semanaActual();
